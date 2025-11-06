@@ -52,7 +52,6 @@ export async function POST(request: NextRequest) {
     // Создаем сервис для работы с Wildberries
     const wbService = new WildberriesService({
       apiKey: integration.apiKey,
-      apiSecret: integration.apiSecret || undefined,
     })
 
     // Обновляем статус синхронизации

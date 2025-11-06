@@ -10,6 +10,8 @@ export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  let payload: any = null
+  
   try {
     const token = getTokenFromRequest(request)
 
@@ -20,7 +22,7 @@ export async function POST(
       )
     }
 
-    const payload = verifyToken(token)
+    payload = verifyToken(token)
 
     if (!payload) {
       return NextResponse.json(
@@ -174,8 +176,8 @@ export async function POST(
       data: {
         status: 'GENERATED',
         totalAmount: calculations.total,
-        marketplaceData: dbProvider === 'postgresql' ? marketplaceData : serializeJsonField(marketplaceData),
-        calculations: dbProvider === 'postgresql' ? calculations : serializeJsonField(calculations),
+        marketplaceData: (dbProvider === 'postgresql' ? marketplaceData : serializeJsonField(marketplaceData)) as any,
+        calculations: (dbProvider === 'postgresql' ? calculations : serializeJsonField(calculations)) as any,
       },
       include: {
         company: {

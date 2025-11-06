@@ -162,9 +162,9 @@ export default function BillingList() {
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="start">
                   <Box>
-                    <Typography variant="h6">{billing.company.name}</Typography>
+                    <Typography variant="h6">{billing.company?.name || 'Неизвестная компания'}</Typography>
                     <Typography variant="body2" color="text.secondary">
-                      ИНН: {billing.company.inn}
+                      ИНН: {billing.company?.inn || 'N/A'}
                     </Typography>
                     <Typography variant="body2" color="text.secondary" mt={1}>
                       Период: {formatDate(billing.periodStart)} - {formatDate(billing.periodEnd)}
