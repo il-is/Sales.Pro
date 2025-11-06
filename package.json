@@ -14,7 +14,9 @@
     "db:switch:sqlite": "cp prisma/schema.prisma prisma/schema.backup.prisma && cp prisma/schema.sqlite.prisma prisma/schema.prisma 2>/dev/null || echo 'SQLite schema is default'",
     "db:switch:postgres": "cp prisma/schema.prisma prisma/schema.backup.prisma && cp prisma/schema.postgresql.prisma prisma/schema.prisma",
     "db:setup:postgres": "npm run db:switch:postgres && npm run db:generate && npm run db:push",
-    "db:setup:sqlite": "npm run db:switch:sqlite && npm run db:generate && npm run db:push"
+    "db:setup:sqlite": "npm run db:switch:sqlite && npm run db:generate && npm run db:push",
+    "postinstall": "prisma generate",
+    "vercel-build": "prisma generate && prisma migrate deploy && next build"
   },
   "dependencies": {
     "next": "14.2.5",
