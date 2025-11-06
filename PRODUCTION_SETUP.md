@@ -24,12 +24,13 @@ npm run db:generate
 
 ```
 DATABASE_URL=postgresql://neondb_owner:npg_FPGKV8QfJCB0@ep-sweet-term-ah6ieptn-pooler.c-3.us-east-1.aws.neon.tech/neondb?sslmode=require
-JWT_SECRET=your-super-secret-jwt-key-min-32-chars-change-this
+JWT_SECRET=Fff3f33f39901931r3Fff3f33f399019
 ```
 
 **Важно:** 
 - `DATABASE_URL` - используйте строку подключения из Neon
-- `JWT_SECRET` - сгенерируйте случайную строку (минимум 32 символа)
+- `JWT_SECRET` - ваш секретный ключ (уже предоставлен выше)
+- Убедитесь, что обе переменные добавлены для всех окружений (Production, Preview, Development)
 
 ### Шаг 4: Применение миграций
 
