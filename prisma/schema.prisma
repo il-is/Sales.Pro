@@ -1,4 +1,4 @@
-// This is your Prisma schema file,
+// This is your Prisma schema file for PostgreSQL (Production)
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
@@ -6,8 +6,21 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum BillingStatus {
+  DRAFT
+  GENERATED
+  SENT
+  PAID
+  CANCELLED
 }
 
 model User {
@@ -15,7 +28,7 @@ model User {
   email     String   @unique
   password  String
   name      String?
-  role      String   @default("USER") // USER или ADMIN
+  role      UserRole @default(USER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   
@@ -49,7 +62,7 @@ model BillingConfig {
   companyId String   @unique
   company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
   
-  services  String   @default("[]") // JSON строка: массив услуг с галочками и ценами
+  services  Json   @default("[]") // JSON: массив услуг с галочками и ценами
   // Пример: [{"id": "storage", "name": "Хранение", "enabled": true, "price": 10.5, "unit": "за м²/месяц"}, ...]
   
   createdAt DateTime @default(now())
@@ -63,15 +76,15 @@ model Billing {
   
   periodStart DateTime
   periodEnd   DateTime
-  status      String   @default("DRAFT") // DRAFT, GENERATED, SENT, PAID, CANCELLED
+  status      BillingStatus @default(DRAFT)
   
   totalAmount Float    @default(0)
   
-  // Данные из маркетплейса (JSON строка)
-  marketplaceData String?
+  // Данные из маркетплейса (JSON)
+  marketplaceData Json?
   
-  // Расчетные данные (JSON строка)
-  calculations    String?
+  // Расчетные данные (JSON)
+  calculations    Json?
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
