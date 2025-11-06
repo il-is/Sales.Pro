@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
+import { parseJsonField } from '@/lib/db-utils'
 import { z } from 'zod'
 
 const serviceSchema = z.object({
@@ -51,7 +52,7 @@ export async function GET(request: NextRequest) {
       .filter((c) => c.billingConfig)
       .map((c) => ({
         ...c.billingConfig,
-        services: JSON.parse(c.billingConfig!.services || '[]'),
+        services: parseJsonField(c.billingConfig!.services) || [],
         companyId: c.id,
       }))
 

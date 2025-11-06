@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
+import { parseJsonField } from '@/lib/db-utils'
 import { z } from 'zod'
 
 const updateCompanySchema = z.object({
@@ -52,10 +53,10 @@ export async function GET(
       },
     })
 
-    // Парсим JSON строку services если есть
+    // Парсим JSON services если есть (работает и со String и с Json типами)
     if (company?.billingConfig) {
       try {
-        const services = JSON.parse(company.billingConfig.services || '[]')
+        const services = parseJsonField(company.billingConfig.services) || []
         company.billingConfig = { ...company.billingConfig, services } as any
       } catch (e) {
         // Если не удалось распарсить, оставляем как есть
