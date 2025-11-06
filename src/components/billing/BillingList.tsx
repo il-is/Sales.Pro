@@ -70,11 +70,17 @@ export default function BillingList() {
 
   const handleGenerate = async (billingId: string) => {
     setGenerating(billingId)
-    const result = await generateBilling(billingId)
-    if (!result.success) {
-      alert(result.error || 'Ошибка при генерации биллинга')
+    try {
+      const result = await generateBilling(billingId)
+      if (!result.success) {
+        alert(result.error || 'Ошибка при генерации биллинга')
+      }
+    } catch (error: any) {
+      console.error('Generate billing error:', error)
+      alert(error.message || 'Ошибка при генерации биллинга')
+    } finally {
+      setGenerating(null)
     }
-    setGenerating(null)
   }
 
   const handleDelete = async (billingId: string) => {

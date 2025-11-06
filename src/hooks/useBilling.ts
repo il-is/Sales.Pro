@@ -47,9 +47,11 @@ export function useBilling() {
       )
       return { success: true, billing: response.data.billing }
     } catch (err: any) {
+      console.error('Generate billing error:', err)
+      const errorMessage = err.response?.data?.error || err.response?.data?.details || err.message || 'Ошибка при генерации биллинга'
       return {
         success: false,
-        error: err.response?.data?.error || 'Ошибка при генерации биллинга',
+        error: errorMessage,
       }
     }
   }

@@ -166,14 +166,16 @@ export async function POST(
 
     // Обновляем биллинг
     // Для PostgreSQL Prisma ожидает Json (объект), для SQLite - String
-    // Используем as any для совместимости с обоими типами
+    // Определяем тип БД и сериализуем соответственно
+    const dbProvider = process.env.DATABASE_URL?.includes('postgresql') ? 'postgresql' : 'sqlite'
+    
     const updatedBilling = await prisma.billing.update({
       where: { id: params.id },
       data: {
         status: 'GENERATED',
         totalAmount: calculations.total,
-        marketplaceData: marketplaceData as any,
-        calculations: calculations as any,
+        marketplaceData: dbProvider === 'postgresql' ? marketplaceData : serializeJsonField(marketplaceData),
+        calculations: dbProvider === 'postgresql' ? calculations : serializeJsonField(calculations),
       },
       include: {
         company: {
@@ -203,11 +205,29 @@ export async function POST(
       message: 'Биллинг успешно сгенерирован',
     })
   } catch (error: any) {
-    console.error('Generate billing error:', error)
+    console.error('Generate billing error:', {
+      message: error.message,
+      stack: error.stack,
+      billingId: params.id,
+      userId: payload?.userId,
+    })
+    
+    // Более детальное сообщение об ошибке
+    let errorMessage = 'Ошибка при генерации биллинга'
+    let errorDetails = error.message || 'Неизвестная ошибка'
+    
+    if (error.message?.includes('API')) {
+      errorMessage = 'Ошибка при обращении к API Wildberries'
+      errorDetails = error.message
+    } else if (error.message?.includes('Prisma')) {
+      errorMessage = 'Ошибка при сохранении в базу данных'
+      errorDetails = error.message
+    }
+    
     return NextResponse.json(
       {
-        error: 'Ошибка при генерации биллинга',
-        details: error.message || 'Неизвестная ошибка',
+        error: errorMessage,
+        details: errorDetails,
       },
       { status: 500 }
     )
