@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import {
   Box,
@@ -38,11 +38,7 @@ export default function CompanyDetails() {
   const [openForm, setOpenForm] = useState(false)
   const [billingCount, setBillingCount] = useState(0)
 
-  useEffect(() => {
-    fetchCompany()
-  }, [companyId])
-
-  const fetchCompany = async () => {
+  const fetchCompany = useCallback(async () => {
     try {
       setLoading(true)
       setError(null)
@@ -54,7 +50,11 @@ export default function CompanyDetails() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [companyId])
+
+  useEffect(() => {
+    fetchCompany()
+  }, [fetchCompany])
 
   if (loading) {
     return (

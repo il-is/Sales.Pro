@@ -204,7 +204,7 @@ export default function CompanyList() {
         <DialogTitle>Удалить компанию?</DialogTitle>
         <DialogContent>
           <Typography>
-            Вы уверены, что хотите удалить компанию "{deleteDialog.company?.name}"?
+            Вы уверены, что хотите удалить компанию &quot;{deleteDialog.company?.name}&quot;?
             Это действие нельзя отменить.
           </Typography>
         </DialogContent>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { api } from './useAuth'
 import { BillingConfig, BillingService } from '@/types/billing'
 
@@ -7,7 +7,7 @@ export function useBillingConfig(companyId: string | null) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchConfig = async () => {
+  const fetchConfig = useCallback(async () => {
     if (!companyId) return
 
     try {
@@ -20,11 +20,11 @@ export function useBillingConfig(companyId: string | null) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [companyId])
 
   useEffect(() => {
     fetchConfig()
-  }, [companyId])
+  }, [fetchConfig])
 
   const updateConfig = async (services: BillingService[]) => {
     if (!companyId) {

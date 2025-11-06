@@ -232,7 +232,7 @@ export default function BillingConfig({ companyId }: BillingConfigProps) {
           {services.length === 0 && (
             <Box sx={{ textAlign: 'center', py: 4 }}>
               <Typography color="text.secondary" gutterBottom>
-                Нет услуг. Нажмите "Добавить услугу" для создания.
+                Нет услуг. Нажмите &quot;Добавить услугу&quot; для создания.
               </Typography>
             </Box>
           )}

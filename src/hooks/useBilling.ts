@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { api } from './useAuth'
 import { Billing, CreateBillingDto } from '@/types/billing'
 
@@ -83,7 +83,7 @@ export function useBillingDetail(billingId: string | null) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchBilling = async () => {
+  const fetchBilling = useCallback(async () => {
     if (!billingId) return
 
     try {
@@ -96,11 +96,11 @@ export function useBillingDetail(billingId: string | null) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [billingId])
 
   useEffect(() => {
     fetchBilling()
-  }, [billingId])
+  }, [fetchBilling])
 
   return {
     billing,
