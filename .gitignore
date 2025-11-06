@@ -36,7 +36,8 @@ yarn-error.log*
 next-env.d.ts
 
 # prisma
-/prisma/migrations
 /prisma/*.db
 /prisma/*.db-journal
+# Миграции должны быть в git для автоматического применения на Vercel
+# /prisma/migrations
 
