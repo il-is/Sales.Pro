@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
+import { parseJsonField, serializeJsonField } from '@/lib/db-utils'
 import { WildberriesService } from '@/services/wildberries.service'
 import { BillingCalculator } from '@/services/billing.service'
 
@@ -66,8 +67,8 @@ export async function POST(
       )
     }
 
-    // Парсим конфигурацию услуг
-    const services = JSON.parse(billing.company.billingConfig.services || '[]')
+    // Парсим конфигурацию услуг (работает и со String и с Json типами)
+    const services = parseJsonField(billing.company.billingConfig.services) || []
 
     // Получаем данные с Wildberries
     const wbService = new WildberriesService({
@@ -164,13 +165,15 @@ export async function POST(
     })
 
     // Обновляем биллинг
+    // Для PostgreSQL Prisma ожидает Json (объект), для SQLite - String
+    // Используем as any для совместимости с обоими типами
     const updatedBilling = await prisma.billing.update({
       where: { id: params.id },
       data: {
         status: 'GENERATED',
         totalAmount: calculations.total,
-        marketplaceData: JSON.stringify(marketplaceData),
-        calculations: JSON.stringify(calculations),
+        marketplaceData: marketplaceData as any,
+        calculations: calculations as any,
       },
       include: {
         company: {

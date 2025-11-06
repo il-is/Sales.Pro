@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      String   @default("USER") // USER или ADMIN
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  companies Company[]
+  billings  Billing[]
+  integrations Integration[]
+}
+
+model Company {
+  id           String   @id @default(cuid())
+  name         String
+  inn          String   @unique
+  legalAddress String?
+  contactPerson String?
+  email        String?
+  phone        String?
+  // API ключ для интеграции с Wildberries
+  wbApiKey     String?  // API ключ Wildberries для этой компании
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  billingConfig BillingConfig?
+  billings      Billing[]
+}
+
+model BillingConfig {
+  id        String   @id @default(cuid())
+  companyId String   @unique
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  services  String   @default("[]") // JSON строка: массив услуг с галочками и ценами
+  // Пример: [{"id": "storage", "name": "Хранение", "enabled": true, "price": 10.5, "unit": "за м²/месяц"}, ...]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Billing {
+  id          String   @id @default(cuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  periodStart DateTime
+  periodEnd   DateTime
+  status      String   @default("DRAFT") // DRAFT, GENERATED, SENT, PAID, CANCELLED
+  
+  totalAmount Float    @default(0)
+  
+  // Данные из маркетплейса (JSON строка)
+  marketplaceData String?
+  
+  // Расчетные данные (JSON строка)
+  calculations    String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Integration {
+  id          String   @id @default(cuid())
+  type        String   // WILDBERRIES, OZON, YANDEX_MARKET
+  apiKey      String?  // Зашифрованное поле
+  apiSecret   String?  // Зашифрованное поле
+  isActive    Boolean  @default(false)
+  
+  lastSyncAt  DateTime?
+  syncStatus  String   @default("IDLE") // IDLE, SYNCING, SUCCESS, ERROR
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+

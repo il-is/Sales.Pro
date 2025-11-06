@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
+import { parseJsonField } from '@/lib/db-utils'
 
 // GET /api/billing/[id] - Получить биллинг
 export async function GET(
@@ -53,11 +54,11 @@ export async function GET(
       )
     }
 
-    // Парсим JSON строки
+    // Парсим JSON (работает и со String и с Json типами)
     const parsedBilling = {
       ...billing,
-      marketplaceData: billing.marketplaceData ? JSON.parse(billing.marketplaceData) : null,
-      calculations: billing.calculations ? JSON.parse(billing.calculations) : null,
+      marketplaceData: parseJsonField(billing.marketplaceData),
+      calculations: parseJsonField(billing.calculations),
     }
 
     return NextResponse.json({ billing: parsedBilling })

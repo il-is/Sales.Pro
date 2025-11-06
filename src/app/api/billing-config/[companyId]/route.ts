@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
+import { parseJsonField, serializeJsonField } from '@/lib/db-utils'
 import { z } from 'zod'
 
 const serviceSchema = z.object({
@@ -103,8 +104,8 @@ export async function GET(
       })
     }
 
-    // Парсим JSON строку
-    const services = JSON.parse(company.billingConfig.services || '[]')
+    // Парсим JSON (работает и со String и с Json типами)
+    const services = parseJsonField(company.billingConfig.services) || []
 
     return NextResponse.json({
       config: {
@@ -166,8 +167,8 @@ export async function PUT(
     const body = await request.json()
     const validatedData = updateConfigSchema.parse(body)
 
-    // Сохраняем services как JSON строку
-    const servicesJson = JSON.stringify(validatedData.services)
+    // Сохраняем services (Prisma автоматически обработает для PostgreSQL Json или SQLite String)
+    const servicesJson = serializeJsonField(validatedData.services)
 
     // Проверяем, существует ли конфигурация
     const existingConfig = await prisma.billingConfig.findUnique({
@@ -194,7 +195,7 @@ export async function PUT(
     }
 
     // Парсим для ответа
-    const services = JSON.parse(config.services || '[]')
+    const services = parseJsonField(config.services) || []
 
     return NextResponse.json({
       config: {

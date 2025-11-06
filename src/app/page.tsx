@@ -15,7 +15,7 @@ export default function Home() {
         }}
       >
         <Typography variant="h3" component="h1" gutterBottom>
-          Sales.Pro Billing
+          Sales.Pro
         </Typography>
         <Typography variant="h6" color="text.secondary" gutterBottom>
           Автоматизация составления биллинга для склада ответственного хранения

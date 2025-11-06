@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
+import { parseJsonField } from '@/lib/db-utils'
 import { z } from 'zod'
 
 const createBillingSchema = z.object({
@@ -48,11 +49,11 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    // Парсим JSON строки
+    // Парсим JSON (работает и со String и с Json типами)
     const parsedBillings = billings.map((billing) => ({
       ...billing,
-      marketplaceData: billing.marketplaceData ? JSON.parse(billing.marketplaceData) : null,
-      calculations: billing.calculations ? JSON.parse(billing.calculations) : null,
+      marketplaceData: parseJsonField(billing.marketplaceData),
+      calculations: parseJsonField(billing.calculations),
     }))
 
     return NextResponse.json({ billings: parsedBillings })
